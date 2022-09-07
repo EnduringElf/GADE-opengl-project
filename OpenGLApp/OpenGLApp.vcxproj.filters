@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{7e4d98df-bb81-44d6-abb9-36e45fdc5f95}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OpenGLApp.cpp">
@@ -26,5 +29,16 @@
     <None Include="..\..\..\..\..\..\OpenGl\glfw-3.3.8.bin.WIN32\glfw-3.3.8.bin.WIN32\lib-vc2015\glfw3.dll">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="core.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="core.frag">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
