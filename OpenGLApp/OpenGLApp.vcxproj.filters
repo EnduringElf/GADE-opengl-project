@@ -16,6 +16,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{7e4d98df-bb81-44d6-abb9-36e45fdc5f95}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Images">
+      <UniqueIdentifier>{89bfa5da-d34c-40b4-a63c-34238abfa0de}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OpenGLApp.cpp">
@@ -40,5 +43,13 @@
     <ClInclude Include="Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\res\images\image1.png">
+      <Filter>Images</Filter>
+    </Image>
+    <Image Include="..\res\images\image1.jpg">
+      <Filter>Images</Filter>
+    </Image>
   </ItemGroup>
 </Project>
