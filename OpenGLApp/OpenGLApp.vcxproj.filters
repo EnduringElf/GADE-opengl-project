@@ -43,12 +43,18 @@
     <ClInclude Include="Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\res\images\image1.png">
+    <Image Include="..\res\images\image2.png">
       <Filter>Images</Filter>
     </Image>
     <Image Include="..\res\images\image1.jpg">
+      <Filter>Images</Filter>
+    </Image>
+    <Image Include="res\heightmaps\iceland_heightmap.png">
       <Filter>Images</Filter>
     </Image>
   </ItemGroup>
