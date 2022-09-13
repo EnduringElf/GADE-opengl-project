@@ -39,6 +39,11 @@ bool firstMouse = true;
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 
+float columns = 7;
+float rows = 7;
+
+
+
 // The MAIN function, from here we start the application and run the game loop
 int main()
 {
@@ -88,14 +93,16 @@ int main()
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     // Setup OpenGL options
-    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 
     // enable alpha support
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Build and compile our shader program
-    Shader ourShader("core.vs", "core.frag");
+    Shader ourShader("res/shaders/core.vs", "res/shaders/core.frag");
+    Shader HightmapShader("res/shaders/hightmap.vs", "res/shaders/hightmap.frag");
+    //Shader BlackColor()
 
     // Set up vertex data (and buffer(s)) and attribute pointers
     // use with Orthographic Projection
@@ -145,7 +152,7 @@ int main()
     */
 
     //// use with Perspective Projection
-    /*GLfloat vertices[] = {
+    GLfloat vertices[] = {
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -187,40 +194,26 @@ int main()
         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
         -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-    };*/
-
-    glm::vec3 cubePositions[] =
-    {
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(2.0f, 5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3(2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f, 3.0f, -7.5f),
-        glm::vec3(1.3f, -2.0f, -2.5f),
-        glm::vec3(1.5f, 2.0f, -2.5f),
-        glm::vec3(1.5f, 0.2f, -1.5f),
-        glm::vec3(-1.3f, 1.0f, -1.5f)
     };
 
-   // GLuint VBO, VAO;
-   //glGenVertexArrays(1, &VAO);
-   // glGenBuffers(1, &VBO);
+    GLuint VBO, VAO;
+   glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
 
 
-    //glBindVertexArray(VAO);
+    glBindVertexArray(VAO);
 
-    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    // Position attribute
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
-    //glEnableVertexAttribArray(0);
-    //// Texture Coordinate attribute
-    //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-    //glEnableVertexAttribArray(2);
+    //Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+    glEnableVertexAttribArray(0);
+    // Texture Coordinate attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(2);
 
-    //glBindVertexArray(0); // Unbind VAO
+    glBindVertexArray(0); // Unbind VAO
 
     // Load and create a texture
     GLuint texture;
@@ -329,6 +322,7 @@ int main()
         indices.size() * sizeof(unsigned int), // size of indices buffer
         &indices[0],                           // pointer to first element
         GL_STATIC_DRAW);
+    glBindVertexArray(0);
     
 
     // Game loop
@@ -347,9 +341,9 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Draw our first triangle
+        
         ourShader.Use();
-
+        
         // Bind Textures using texture units
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -370,11 +364,31 @@ int main()
         // Pass the matrices to the shader
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+        //cubes
+        glBindVertexArray(VAO);
+        //creating cube board
+        for (GLuint x = 0; x < 10; x++)
+        {
+            for (GLuint z = 0; z < 10; z++) {
+                // Calculate the model matrix for each object and pass it to shader before drawing
+                glm::mat4 model(1.f);
+                model = glm::translate(model,glm::vec3(x,0,z));
 
-        //glBindVertexArray(VAO);
-
-        // draw mesh
+                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+            }
+            
+        }
+        glBindVertexArray(0);
+        //std::cout << "finsihed loading cubes shader " << std::endl;
         glBindVertexArray(terrainVAO);
+
+        HightmapShader.Use();
+
+        
+        
+        // draw mesh
+        
         // render the mesh triangle strip by triangle strip - each row at a time
         for (unsigned int strip = 0; strip < NUM_STRIPS; ++strip)
         {
@@ -386,28 +400,16 @@ int main()
                     * strip)); // offset to starting index
         }
 
-        for (GLuint i = 0; i < 10; i++)
-        {
-            // Calculate the model matrix for each object and pass it to shader before drawing
-            glm::mat4 model(1.f);
-            model = glm::translate(model, cubePositions[i]);
-            GLfloat angle = 20.0f * i;
-            //model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
-            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-
         glBindVertexArray(0);
-
+        //std::cout << "finsihed loading hightmap shader " << std::endl;
         // Swap the buffers
         glfwSwapBuffers(window);
     }
 
     // Properly de-allocate all resources once they've outlived their purpose
-    //glDeleteVertexArrays(1, &VAO);
+    glDeleteVertexArrays(1, &VAO);
     glDeleteVertexArrays(1, &terrainVAO);
-    //glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &terrainVBO);
     glDeleteBuffers(1, &terrainEBO);
 

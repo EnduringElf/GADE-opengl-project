@@ -82,7 +82,7 @@ public:
             this->position += this->right * velocity;
         }
     }
-
+    
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
     void ProcessMouseMovement(GLfloat xOffset, GLfloat yOffset, GLboolean constrainPitch = true)
     {
