@@ -38,10 +38,28 @@
     <None Include="res\shaders\core.vs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="res\shaders\hightmap.frag">
+    <None Include="Hightmap.vs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="res\shaders\hightmap.vs">
+    <None Include="Hightmap.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="res\shaders\blackC.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="res\shaders\blackC.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="res\shaders\whiteC.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="res\shaders\whiteC.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="res\shaders\grayC.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="res\shaders\grayC.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
