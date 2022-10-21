@@ -62,12 +62,21 @@
     <None Include="res\shaders\grayC.vs">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Testmodel.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Testmodel.frag">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -79,6 +88,15 @@
       <Filter>Images</Filter>
     </Image>
     <Image Include="res\heightmaps\iceland_heightmap.png">
+      <Filter>Images</Filter>
+    </Image>
+    <Image Include="res\images\gigachad.jfif">
+      <Filter>Images</Filter>
+    </Image>
+    <Image Include="res\images\coolmap.png">
+      <Filter>Images</Filter>
+    </Image>
+    <Image Include="res\images\photo.jfif">
       <Filter>Images</Filter>
     </Image>
   </ItemGroup>

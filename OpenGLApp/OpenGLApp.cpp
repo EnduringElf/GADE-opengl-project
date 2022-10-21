@@ -44,6 +44,13 @@ float rows = 7;
 
 void drawBoard(Shader W, Shader B, Shader G, GLuint VAO, GLfloat y[], GLuint texture);
 void drawTerrain(Shader &s, GLuint VAO, const unsigned int NUM_STRIPS, const unsigned int NUM_VERTS_PER_STRIP);
+void DrawPiece(Shader W, Shader B, GLuint VAO, GLfloat y[], int xpos, float ypos, int zpos, float xscale, float yscale, float zscale);
+void drawPawn(Shader W, Shader B, GLuint VAO, GLfloat y[]);
+void drawKing(Shader W, Shader B, GLuint VAO, GLfloat y[]);
+void DrawQueen(Shader W, Shader B, GLuint VAO, GLfloat y[]);
+void DrawBishop(Shader W, Shader B, GLuint VAO, GLfloat y[]);
+void DrawRook(Shader W, Shader B, GLuint VAO, GLfloat y[]);
+
 
 
 // The MAIN function, from here we start the application and run the game loop
@@ -240,16 +247,13 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
     glEnableVertexAttribArray(0);
     //texture coordinate attribute
-
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
     glBindVertexArray(0); // Unbind VAO
-
     GLuint texture;
     // ===================
     // Texture
     // ===================
-
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -269,9 +273,6 @@ int main()
     SOIL_free_image_data(image);
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture when done, so we won't accidentily mess up our texture.
    
-    
-    
-
     // Game loop
     while (!glfwWindowShouldClose(window))
     {
@@ -292,6 +293,14 @@ int main()
 
         drawTerrain(HightmapShader, terrainVAO, NUM_STRIPS, NUM_VERTS_PER_STRIP);
 
+        drawPawn(grayColor, BlackColor, VAO, ypos);
+        drawKing(grayColor, BlackColor, VAO, ypos);
+        DrawQueen(grayColor, BlackColor, VAO, ypos);
+        DrawBishop(grayColor, BlackColor, VAO, ypos);
+        DrawRook(grayColor, BlackColor, VAO, ypos);
+
+
+
 
         glfwSwapBuffers(window);
         
@@ -309,6 +318,156 @@ int main()
     return EXIT_SUCCESS;
 }
 
+void drawPawn(Shader W, Shader B, GLuint VAO, GLfloat y[]) {
+
+    int zpos = 2;
+    float offset = 0.7;
+
+    for (size_t i = 0; i < 9; i++)
+    {
+        DrawPiece(W, B, VAO, y, i+1,y[i+19]+offset, zpos, 0.8f, 0.2f, 0.8f);
+    }
+    for (size_t i = 0; i < 9; i++)
+    {
+        DrawPiece(W, B, VAO, y, i+1, y[i + 10] +0.6 + offset, zpos, 0.5f, 1.0f, 0.5f);
+    }
+    for (size_t i = 0; i < 9; i++)
+    {
+        DrawPiece(W, B, VAO, y, i+1, y[i + 10] +1 + offset, zpos, 0.7f, 0.2f, 0.7f);
+    }
+    for (size_t i = 0; i < 9; i++)
+    {
+        DrawPiece(W, B, VAO, y, i+1, y[i + 10] + 1.3 + offset, zpos, 0.2f, 0.2f, 0.2f);
+    }
+
+    for (size_t i = 0; i < 9; i++)
+    {
+        DrawPiece(W, B, VAO, y, i + 1, y[i + 19] + offset, zpos-1, 0.8f, 0.2f, 0.8f);
+    }
+    for (size_t i = 0; i < 9; i++)
+    {
+        DrawPiece(W, B, VAO, y, i + 1, y[i + 10] + 0.6 + offset, zpos-1, 0.5f, 1.0f, 0.5f);
+    }
+
+    zpos = 8;
+    for (size_t i = 0; i < 9; i++)
+    {
+        DrawPiece(B, B, VAO, y, i + 1, y[i + 89] + offset, zpos, 0.8f, 0.2f, 0.8f);
+    }
+    for (size_t i = 0; i < 9; i++)
+    {
+        DrawPiece(B, B, VAO, y, i + 1, y[i + 89] + 0.6 + offset, zpos, 0.5f, 1.0f, 0.5f);
+    }
+    for (size_t i = 0; i < 9; i++)
+    {
+        DrawPiece(B, B, VAO, y, i + 1, y[i +89] + 1 + offset, zpos, 0.7f, 0.2f, 0.7f);
+    }
+    for (size_t i = 0; i < 9; i++)
+    {
+        DrawPiece(B, B, VAO, y, i + 1, y[i + 89] + 1.3 + offset, zpos, 0.2f, 0.2f, 0.2f);
+    }
+
+    for (size_t i = 0; i < 9; i++)
+    {
+        DrawPiece(B, B, VAO, y, i + 1, y[i + 89] + offset, zpos+1, 0.8f, 0.2f, 0.8f);
+    }
+    for (size_t i = 0; i < 9; i++)
+    {
+        DrawPiece(B, B, VAO, y, i + 1, y[i + 89] + 0.6 + offset, zpos+1, 0.5f, 1.0f, 0.5f);
+    }
+}
+
+void drawKing(Shader W, Shader B, GLuint VAO, GLfloat y[]) {
+    int zpos = 2;
+    float offset = 0.8;
+    int xpos = 5;
+    DrawPiece(W, B, VAO, y, 5, y[5 + 19] + 1.3 + offset, zpos - 1, 1, 1.3f, 0.5f);
+    zpos = 8;
+    DrawPiece(B, B, VAO, y, 5, y[5 + 89] + 1.3 +  offset, zpos + 1, 1, 1.3f, 0.5f);
+    
+   
+    
+
+}
+void DrawQueen(Shader W, Shader B, GLuint VAO, GLfloat y[]) {
+    int zpos = 2;
+    float offset = 0.8;
+    int xpos = 5;
+    DrawPiece(W, B, VAO, y, 4, y[4 + 19] + 1.3 + offset, zpos - 1, 1, 0.8f, 0.5f);
+    DrawPiece(W, B, VAO, y, 6, y[4 + 19] + 1.3 + offset, zpos - 1, 1, 0.8f, 0.5f);
+    zpos = 8;
+    DrawPiece(B, B, VAO, y, 6, y[6 + 89] + 1.3 + offset, zpos + 1, 1, 0.8f, 0.5f);
+    DrawPiece(B, B, VAO, y, 4, y[6 + 89] + 1.3 + offset, zpos + 1, 1, 0.8f, 0.5f);
+
+    
+
+    
+
+}
+void DrawBishop(Shader W, Shader B, GLuint VAO, GLfloat y[]) {
+    int zpos = 2;
+    float offset = 0.8;
+    int xpos = 5;
+    DrawPiece(W, B, VAO, y, 3, y[3 + 19] + 1.3 + offset, zpos - 1, 0.2f, 0.3f, 0.4f);
+    DrawPiece(W, B, VAO, y, 7, y[3 + 19] + 1.3 + offset, zpos - 1, 0.2f, 0.3f, 0.4f);
+    zpos = 8;
+    DrawPiece(B, B, VAO, y, 7, y[3 + 89] + 1.3 + offset, zpos + 1, 0.2f, 0.3f, 0.4f);
+    DrawPiece(B, B, VAO, y, 3, y[3 + 89] + 1.3 + offset, zpos + 1, 0.2f, 0.3f, 0.4f);
+
+    
+
+}
+void DrawRook(Shader W, Shader B, GLuint VAO, GLfloat y[]) {
+    int zpos = 2;
+    float offset = 0.8;
+    int xpos = 5;
+    DrawPiece(W, B, VAO, y, 2, y[3 + 19] + 1.3 + offset, zpos - 1, 0.1f, 0.4f, 0.7f);
+    DrawPiece(W, B, VAO, y, 8, y[3 + 19] + 1.3 + offset, zpos - 1, 0.2f, 0.4f, 0.7f);
+    zpos = 8;
+    DrawPiece(B, B, VAO, y, 8, y[3 + 89] + 1.3 + offset, zpos + 1, 0.2f, 0.4f, 0.7f);
+    DrawPiece(B, B, VAO, y, 2, y[3 + 89] + 1.3 + offset, zpos + 1, 0.2f, 0.4f, 0.7f);
+
+    
+
+}
+
+void DrawPiece(Shader W, Shader B, GLuint VAO, GLfloat y[],int xpos,float ypos,int zpos,float xscale, float yscale, float zscale) {
+
+    bool activeshader = true;
+
+    Shader s = W;
+
+    glm::mat4 projection(1.f);
+    projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 10000.0f);
+
+    // Create camera transformation
+    glm::mat4 view(1.f);
+    view = camera.GetViewMatrix();
+
+    int i = 0;
+
+    s.Use();
+
+    // Get the uniform locations
+    GLint modelLoc = glGetUniformLocation(s.Program, "model");
+    GLint viewLoc = glGetUniformLocation(s.Program, "view");
+    GLint projLoc = glGetUniformLocation(s.Program, "projection");
+
+    // Pass the matrices to the shader
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+    //cubes
+    glBindVertexArray(VAO);
+    // Calculate the model matrix for each object and pass it to shader before drawing
+    glm::mat4 model(1.f);
+    model = glm::translate(model, glm::vec3(xpos, ypos, zpos));
+    model = glm::scale(model, glm::vec3(xscale, yscale, zscale));
+    i++;
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+}
+
 void drawBoard(Shader W, Shader B,Shader G, GLuint VAO, GLfloat y[], GLuint texture)
 {
     bool activeshader = true;
@@ -322,7 +481,6 @@ void drawBoard(Shader W, Shader B,Shader G, GLuint VAO, GLfloat y[], GLuint text
     glm::mat4 view(1.f);
     view = camera.GetViewMatrix();
 
-    
     //creating cube board
     int i = 0;
     for (GLuint x = 0; x < 11; x++)
@@ -351,7 +509,6 @@ void drawBoard(Shader W, Shader B,Shader G, GLuint VAO, GLfloat y[], GLuint text
                 s = G;
                 uniqueShader = true;
                 y[i] = 0;
-
                 glScalef(2.0, 1.0, 1.0);
 
             }
@@ -373,10 +530,8 @@ void drawBoard(Shader W, Shader B,Shader G, GLuint VAO, GLfloat y[], GLuint text
                 glBindTexture(GL_TEXTURE_2D, texture);
                 glUniform1i(glGetUniformLocation(s.Program, "ourTexture1"), 0);
                
-
             }
             
-
             // Pass the matrices to the shader
             glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
             glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));

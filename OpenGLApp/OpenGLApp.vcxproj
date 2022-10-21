@@ -160,15 +160,21 @@
     <None Include="res\shaders\grayC.vs" />
     <None Include="res\shaders\whiteC.frag" />
     <None Include="res\shaders\whiteC.vs" />
+    <None Include="Testmodel.frag" />
+    <None Include="Testmodel.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Shader.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\res\images\image1.jpg" />
     <Image Include="..\res\images\image2.png" />
     <Image Include="res\heightmaps\iceland_heightmap.png" />
+    <Image Include="res\images\coolmap.png" />
+    <Image Include="res\images\gigachad.jfif" />
+    <Image Include="res\images\photo.jfif" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
