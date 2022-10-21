@@ -42,7 +42,7 @@ GLfloat lastFrame = 0.0f;
 float columns = 7;
 float rows = 7;
 
-void drawBoard(Shader W, Shader B, Shader G, GLuint VAO, GLfloat y[]);
+void drawBoard(Shader W, Shader B, Shader G, GLuint VAO, GLfloat y[], GLuint texture);
 void drawTerrain(Shader &s, GLuint VAO, const unsigned int NUM_STRIPS, const unsigned int NUM_VERTS_PER_STRIP);
 
 
@@ -107,6 +107,7 @@ int main()
     Shader WhiteColor("res/shaders/whiteC.vs", "res/shaders/whiteC.frag");
     Shader BlackColor("res/shaders/blackC.vs", "res/shaders/BlackC.frag");
     Shader grayColor("res/shaders/grayC.vs", "res/shaders/grayC.frag");
+    
 
     //cube vertices
     GLfloat vertices[] = {
@@ -238,10 +239,11 @@ int main()
     //Position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
     glEnableVertexAttribArray(0);
-    
-    glBindVertexArray(0); // Unbind VAO
+    //texture coordinate attribute
 
-    
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
+    glBindVertexArray(0); // Unbind VAO
 
     GLuint texture;
     // ===================
@@ -266,6 +268,9 @@ int main()
     glGenerateMipmap(GL_TEXTURE_2D);
     SOIL_free_image_data(image);
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture when done, so we won't accidentily mess up our texture.
+   
+    
+    
 
     // Game loop
     while (!glfwWindowShouldClose(window))
@@ -283,7 +288,7 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        drawBoard(WhiteColor,BlackColor,grayColor, VAO, ypos);
+        drawBoard(WhiteColor,BlackColor,grayColor, VAO, ypos,texture);
 
         drawTerrain(HightmapShader, terrainVAO, NUM_STRIPS, NUM_VERTS_PER_STRIP);
 
@@ -304,9 +309,10 @@ int main()
     return EXIT_SUCCESS;
 }
 
-void drawBoard(Shader W, Shader B,Shader G, GLuint VAO, GLfloat y[])
+void drawBoard(Shader W, Shader B,Shader G, GLuint VAO, GLfloat y[], GLuint texture)
 {
     bool activeshader = true;
+    bool uniqueShader = false;
     Shader s = W;
 
     glm::mat4 projection(1.f);
@@ -343,7 +349,9 @@ void drawBoard(Shader W, Shader B,Shader G, GLuint VAO, GLfloat y[])
             };
             if (z == 0 || z == 10) {
                 s = G;
+                uniqueShader = true;
                 y[i] = 0;
+
                 glScalef(2.0, 1.0, 1.0);
 
             }
@@ -359,6 +367,15 @@ void drawBoard(Shader W, Shader B,Shader G, GLuint VAO, GLfloat y[])
             GLint modelLoc = glGetUniformLocation(s.Program, "model");
             GLint viewLoc = glGetUniformLocation(s.Program, "view");
             GLint projLoc = glGetUniformLocation(s.Program, "projection");
+
+            if (uniqueShader == true) {
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, texture);
+                glUniform1i(glGetUniformLocation(s.Program, "ourTexture1"), 0);
+               
+
+            }
+            
 
             // Pass the matrices to the shader
             glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
