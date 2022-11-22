@@ -38,12 +38,6 @@
     <None Include="res\shaders\core.vs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Hightmap.vs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Hightmap.frag">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="res\shaders\blackC.frag">
       <Filter>Shaders</Filter>
     </None>
@@ -66,6 +60,36 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Testmodel.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\..\GADE-opengl-project-main\res\shaders\hightmap.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\..\GADE-opengl-project-main\res\shaders\hightmap.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="texturehight.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="texturehight.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="res\shaders\lighting.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="res\shaders\lighting.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="res\shaders\spotlight.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="res\shaders\spotlight.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="res\shaders\PointLight.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="res\shaders\PointLight.frag">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

@@ -150,18 +150,26 @@
   <ItemGroup>
     <None Include="..\..\..\..\..\..\OpenGl\glew-2.1.0-win32\glew-2.1.0\bin\Release\Win32\glew32.dll" />
     <None Include="..\..\..\..\..\..\OpenGl\glfw-3.3.8.bin.WIN32\glfw-3.3.8.bin.WIN32\lib-vc2015\glfw3.dll" />
-    <None Include="Hightmap.vs" />
-    <None Include="Hightmap.frag" />
+    <None Include="..\..\..\..\GADE-opengl-project-main\res\shaders\hightmap.frag" />
+    <None Include="..\..\..\..\GADE-opengl-project-main\res\shaders\hightmap.vs" />
     <None Include="res\shaders\blackC.frag" />
     <None Include="res\shaders\blackC.vs" />
     <None Include="res\shaders\core.frag" />
     <None Include="res\shaders\core.vs" />
     <None Include="res\shaders\grayC.frag" />
     <None Include="res\shaders\grayC.vs" />
+    <None Include="res\shaders\PointLight.frag" />
+    <None Include="res\shaders\PointLight.vs" />
+    <None Include="res\shaders\spotlight.frag" />
+    <None Include="res\shaders\spotlight.vs" />
+    <None Include="res\shaders\lighting.frag" />
+    <None Include="res\shaders\lighting.vs" />
     <None Include="res\shaders\whiteC.frag" />
     <None Include="res\shaders\whiteC.vs" />
     <None Include="Testmodel.frag" />
     <None Include="Testmodel.vs" />
+    <None Include="texturehight.frag" />
+    <None Include="texturehight.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
