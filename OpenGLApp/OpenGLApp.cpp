@@ -20,6 +20,9 @@
 #include <chrono>
 #include "Camera.h"
 
+using namespace std;
+
+
 // Properties
 const GLuint WIDTH = 1600, HEIGHT = 1200;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
@@ -53,10 +56,12 @@ void drawKing(Shader W, Shader B, GLuint VAO, GLfloat y[]);
 void DrawQueen(Shader W, Shader B, GLuint VAO, GLfloat y[]);
 void DrawBishop(Shader W, Shader B, GLuint VAO, GLfloat y[]);
 void DrawRook(Shader W, Shader B, GLuint VAO, GLfloat y[]);
-void   drawspotlight(Shader L);
+void drawspotlight(Shader L);
 void drawPointlight(Shader L);
 void drawDirectionalLight(Shader L);
 void printFPS();
+unsigned int loadCubemap(string faces[]);
+
 
 
 
@@ -128,9 +133,10 @@ int main()
     Shader lightingShader("res/shaders/lighting.vs", "res/shaders/lighting.frag");
     //spot light
     Shader lampShader("res/shaders/spotlight.vs", "res/shaders/spotlight.frag");
-
     //point light
     Shader PointShader("res/shaders/PointLight.vs", "res/shaders/PointLight.frag");
+    //skybox shader
+    Shader skyboxShader("res/shaders/Skybox.vs", "res/shaders/Skybox.frag");
 
 
     // Positions of the point lights
@@ -245,6 +251,52 @@ int main()
         -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     }; 
+    //skybox vertices
+    float skyboxVertices[] = {
+        // positions          
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
+    };
+
     //y rand position for the board
     GLfloat ypos[121];
 
@@ -347,7 +399,7 @@ int main()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
     glBindVertexArray(0);
 
-    //NEWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+    //NEW
     // First, set the container's VAO (and VBO)
     GLuint VBObox, boxVAO;
     glGenVertexArrays(1, &boxVAO);
@@ -413,7 +465,7 @@ int main()
     glGenTextures(1, &diffuseMap1);
     glGenTextures(1, &specularMap1);
     glGenTextures(1, &emissionMap1);
-    //NEWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+    //NEW
    
    
     GLuint VBO, VAO;
@@ -453,15 +505,39 @@ int main()
     glGenerateMipmap(GL_TEXTURE_2D);
     SOIL_free_image_data(image3);
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture when done, so we won't accidentily mess up our texture.
-   
-
-
+  
     // Set texture units
     lightingShader.Use();
     glUniform1i(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 0);
     glUniform1i(glGetUniformLocation(lightingShader.Program, "material.specular"), 1);
 
     glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
+
+    // skybox VAO
+    unsigned int skyboxVAO, skyboxVBO;
+    glGenVertexArrays(1, &skyboxVAO);
+    glGenBuffers(1, &skyboxVBO);
+    glBindVertexArray(skyboxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    // load textures
+    // -------------
+    string faces[] = {
+        "res/images/right.jpg",
+        "res/images/left.jpg",
+        "res/images/top.jpg",
+        "res/images/bottom.jpg",
+        "res/images/front.jpg",
+        "res/images/back.jpg"
+    };
+    unsigned int cubemapTexture = loadCubemap(faces);
+
+    skyboxShader.Use();
+    glUniform1i(glGetUniformLocation(skyboxShader.Program, "skybox"), 0);
+
 
     // check the above later 
     // Game loop
@@ -479,6 +555,34 @@ int main()
         // Clear the colorbuffer
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glDepthFunc(GL_LEQUAL);
+        glDepthMask(GL_FALSE);  // change depth function so depth test passes when values are equal to depth buffer's content
+
+        // draw skybox as last
+        glm::mat4 view;
+        glm::mat4 projection(1.f);
+        projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
+        
+        skyboxShader.Use();
+        view = camera.GetViewMatrix();
+        //view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
+        glm::mat4 Skyboxmodel;
+        
+        glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+        //skyboxShader.setMat4("projection", projection);
+        glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(Skyboxmodel));
+        Skyboxmodel = glm::mat4(1.0f);
+        // skybox cube
+        glBindVertexArray(skyboxVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glDepthMask(GL_TRUE); // set depth function back to default
+        glDepthFunc(GL_LESS);
+
+        
         
         drawBoard(WhiteColor , BlackColor, grayColor, VAO, ypos, texture);
                                        // make sure to draw lights first so we can map them to the terrain below these calls
@@ -495,29 +599,18 @@ int main()
         DrawRook(grayColor, BlackColor, VAO, ypos);
         printFPS();
         
-
-
         
 
-
-
-
-        glm::mat4 projection(1.f);
-        projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 10000.0f);
-
         // Create camera transformation
-        glm::mat4 view2(1.f);
-        //NEWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+        
+        //NEW
         lightingShader.Use();
         GLint lightPosLoc = glGetUniformLocation(lightingShader.Program, "light.position");
         GLint viewPosLoc = glGetUniformLocation(lightingShader.Program, "viewPos");
         glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
        // glUniform3f(viewPosLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
-        
-
-        glUniformMatrix4fv(viewPosLoc, 1, GL_FALSE, glm::value_ptr(view2));
-
+        glUniformMatrix4fv(viewPosLoc, 1, GL_FALSE, glm::value_ptr(view));
 
         // Set the defualt lights properties to intitlize the rest of the lights to come
         glUniform3f(glGetUniformLocation(lightingShader.Program, "light.ambient"), 60.2f, 0.2f, 0.2f);
@@ -531,27 +624,8 @@ int main()
         // Set material properties
         glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shininess"), 599.0f);
 
-
-
-
-
-
-       
-
-
-
-
-
-       
-
-       
-        
-
-
-
-
         // Create camera transformations
-        glm::mat4 view;
+        
         view = camera.GetViewMatrix();
 
         // Get the uniform locations
@@ -579,11 +653,9 @@ int main()
             GLfloat angle = 20.0f * i;
             model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         glBindVertexArray(0);
-
 
        // Also draw the lamp object, again binding the appropriate shader
         lampShader.Use();
@@ -603,12 +675,8 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
 
-        //NEWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
-
-
-
-
-         // We now draw as many light bulbs as we have point lights.
+        //NEW
+        // We now draw as many light bulbs as we have point lights.
         glBindVertexArray(lightVAO);
         for (GLuint i = 0; i < 4; i++)
         {
@@ -619,9 +687,6 @@ int main()
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         glBindVertexArray(0);
-
-
-
         glfwSwapBuffers(window);
         
     }
@@ -632,16 +697,21 @@ int main()
     glDeleteVertexArrays(1, &terrainVAO);
     glDeleteBuffers(1, &terrainVBO);
     glDeleteBuffers(1, &terrainEBO);
+    glDeleteBuffers(1, &skyboxVBO);
+    glDeleteVertexArrays(1, &skyboxVAO);
 
-    //NEWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+
+    //NEW
     glDeleteVertexArrays(1, &boxVAO);
     glDeleteVertexArrays(1, &lightVAO);
     glDeleteBuffers(1, &VBObox);
-    //NEWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+    //NEW
     glfwTerminate();
 
     return EXIT_SUCCESS;
 }
+
+
 
 void printFPS() {
     //create a FPS counter that displays to our console 
@@ -686,10 +756,7 @@ void drawspotlight (Shader L)
 }
 
 void drawDirectionalLight(Shader L)
-
 {
-
-
     L.Use();
     GLint lightPosLoc = glGetUniformLocation(L.Program, "light.position");
     GLint viewPosLoc = glGetUniformLocation(L.Program, "viewPos");
@@ -700,6 +767,7 @@ void drawDirectionalLight(Shader L)
     glUniform3f(glGetUniformLocation(L.Program, "dirLight.diffuse"), 0.4f, 0.4f, 0.4f);
     glUniform3f(glGetUniformLocation(L.Program, "dirLight.specular"), 0.5f, 0.5f, 0.5f);
 }
+
 void drawPointlight(Shader L)
 
 {
@@ -822,10 +890,8 @@ void drawKing(Shader W, Shader B, GLuint VAO, GLfloat y[]) {
     zpos = 8;
     DrawPiece(B, B, VAO, y, 5, y[5 + 89] + 1.3 +  offset, zpos + 1, 1, 1.3f, 0.5f);
     
-   
-    
-
 }
+
 void DrawQueen(Shader W, Shader B, GLuint VAO, GLfloat y[]) {
     int zpos = 2;
     float offset = 0.8;
@@ -836,11 +902,8 @@ void DrawQueen(Shader W, Shader B, GLuint VAO, GLfloat y[]) {
     DrawPiece(B, B, VAO, y, 6, y[6 + 89] + 1.3 + offset, zpos + 1, 1, 0.8f, 0.5f);
     DrawPiece(B, B, VAO, y, 4, y[6 + 89] + 1.3 + offset, zpos + 1, 1, 0.8f, 0.5f);
 
-    
-
-    
-
 }
+
 void DrawBishop(Shader W, Shader B, GLuint VAO, GLfloat y[]) {
     int zpos = 2;
     float offset = 0.8;
@@ -851,9 +914,8 @@ void DrawBishop(Shader W, Shader B, GLuint VAO, GLfloat y[]) {
     DrawPiece(B, B, VAO, y, 7, y[3 + 89] + 1.3 + offset, zpos + 1, 0.2f, 0.3f, 0.4f);
     DrawPiece(B, B, VAO, y, 3, y[3 + 89] + 1.3 + offset, zpos + 1, 0.2f, 0.3f, 0.4f);
 
-    
-
 }
+
 void DrawRook(Shader W, Shader B, GLuint VAO, GLfloat y[]) {
     int zpos = 2;
     float offset = 0.8;
@@ -863,8 +925,6 @@ void DrawRook(Shader W, Shader B, GLuint VAO, GLfloat y[]) {
     zpos = 8;
     DrawPiece(B, B, VAO, y, 8, y[3 + 89] + 1.3 + offset, zpos + 1, 0.2f, 0.4f, 0.7f);
     DrawPiece(B, B, VAO, y, 2, y[3 + 89] + 1.3 + offset, zpos + 1, 0.2f, 0.4f, 0.7f);
-
-    
 
 }
 
@@ -1025,6 +1085,7 @@ void drawTerrain(Shader &s,  GLuint VAO, const unsigned int NUM_STRIPS, const un
    
     glUseProgram(0);
 }
+
 //
 //void drawTerraintwo(Shader& s, GLuint VAO2, const unsigned int NUM_STRIPS, const unsigned int NUM_VERTS_PER_STRIP)
 //{
@@ -1061,6 +1122,35 @@ void drawTerrain(Shader &s,  GLuint VAO, const unsigned int NUM_STRIPS, const un
 //    glUseProgram(0);
 //}
 
+unsigned int loadCubemap(string faces[]) {
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    int width, height, nrComponents;
+    for (unsigned int i = 0; i < 6; i++)
+    {
+        unsigned char *data = SOIL_load_image(faces[i].c_str(), &width, &height, &nrComponents, 0);
+        if (data)
+        {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            std::cout << "cube map face :  " << i << faces[i] << std::endl;
+            SOIL_free_image_data(data);
+        }
+        else
+        {
+            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+            SOIL_free_image_data(data);
+        }
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
+}
 
 
 // Moves/alters the camera positions based on user input

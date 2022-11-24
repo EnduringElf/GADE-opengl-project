@@ -160,6 +160,8 @@
     <None Include="res\shaders\grayC.vs" />
     <None Include="res\shaders\PointLight.frag" />
     <None Include="res\shaders\PointLight.vs" />
+    <None Include="res\shaders\Skybox.frag" />
+    <None Include="res\shaders\Skybox.vs" />
     <None Include="res\shaders\spotlight.frag" />
     <None Include="res\shaders\spotlight.vs" />
     <None Include="res\shaders\lighting.frag" />

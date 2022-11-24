@@ -92,6 +92,12 @@
     <None Include="res\shaders\PointLight.frag">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="res\shaders\Skybox.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="res\shaders\Skybox.frag">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
