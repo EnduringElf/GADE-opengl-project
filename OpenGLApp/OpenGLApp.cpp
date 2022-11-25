@@ -97,7 +97,7 @@ int main()
     glfwSetKeyCallback(window, KeyCallback);
     glfwSetCursorPosCallback(window, MouseCallback);
     glfwSetScrollCallback(window, ScrollCallback);
-    Camera  camera(glm::vec3(0.0f, 0.0f, 3.0f));
+   
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
     // Options, removes the mouse cursor for a more immersive experience
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -147,7 +147,7 @@ int main()
         glm::vec3(300.0f,  1.0f, -3.0f)
     };
 
-
+    //cube
     GLfloat vertices2[] =
     {
         // Positions            // Normals              // Texture Coords
@@ -345,27 +345,7 @@ int main()
         }
     }
 
-   // std::vector<float> Hvertices2;
-   // float yScale2 = 64.0f / 256.0f, yShift2 = 16.0f;  // apply a scale+shift to the height data
-   // for (unsigned int i = 0; i < height3; i++)
-   // {
-   //     for (unsigned int j = 0; j < width3; j++)
-   //     {
-   //         // retrieve texel for (i,j) tex coord
-   //         unsigned char* texel2 = data2 + (j + width3 * i) * nChannels;
-   //         // raw height at coordinate
-   //       
-   //         unsigned char x = texel2[0];
-
-   //         // vertex
-   //         Hvertices2.push_back(-height3 / 2.0f + i);        // v.x
-   //         Hvertices2.push_back((int)x * yScale - yShift);  // v.y
-   //         Hvertices2.push_back(-width3 / 2.0f + j);        // v.z
-   //     }
-   // }
-   // std::cout << "Loaded " << Hvertices.size() / 3 << " vertices" << std::endl;
-   // SOIL_free_image_data(data);
-   //// SOIL_free_image_data(data2);
+  
 
     // index generation
     std::vector<unsigned int> indices;
@@ -565,11 +545,12 @@ int main()
         
         skyboxShader.Use();
         view = camera.GetViewMatrix();
-        //view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
+        
+        view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
         glm::mat4 Skyboxmodel;
         
         glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-        //skyboxShader.setMat4("projection", projection);
+       
         glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
         glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(Skyboxmodel));
         Skyboxmodel = glm::mat4(1.0f);
@@ -583,32 +564,32 @@ int main()
         glDepthFunc(GL_LESS);
 
         
-        
+        //drawing our chess bored 
         drawBoard(WhiteColor , BlackColor, grayColor, VAO, ypos, texture);
                                        // make sure to draw lights first so we can map them to the terrain below these calls
         drawspotlight(lightingShader);          //spot light
         drawDirectionalLight(lightingShader);  //directional light (lights entire map)
         drawPointlight(lightingShader);       // point lights we have 3 in scene 
         drawTerrain(lightingShader,  terrainVAO,  NUM_STRIPS, NUM_VERTS_PER_STRIP);
-        //drawTerraintwo(HightmapShader, terrainVAOtwo, NUM_STRIPS, NUM_VERTS_PER_STRIP);
-
+        
+        /// draw methods for chess peices called here
         drawPawn(grayColor, BlackColor, VAO, ypos);
         drawKing(grayColor, BlackColor, VAO, ypos);
         DrawQueen(grayColor, BlackColor, VAO, ypos);
         DrawBishop(grayColor, BlackColor, VAO, ypos);
         DrawRook(grayColor, BlackColor, VAO, ypos);
+        // important to only call fps counter after all elements renderd to get true frames per second 
         printFPS();
         
         
 
-        // Create camera transformation
         
-        //NEW
+        
         lightingShader.Use();
         GLint lightPosLoc = glGetUniformLocation(lightingShader.Program, "light.position");
         GLint viewPosLoc = glGetUniformLocation(lightingShader.Program, "viewPos");
         glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
-       // glUniform3f(viewPosLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
+       
 
         glUniformMatrix4fv(viewPosLoc, 1, GL_FALSE, glm::value_ptr(view));
 
@@ -675,8 +656,8 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
 
-        //NEW
-        // We now draw as many light bulbs as we have point lights.
+       
+        //  draw as many light bulbs as we have point lights.
         glBindVertexArray(lightVAO);
         for (GLuint i = 0; i < 4; i++)
         {
@@ -701,20 +682,20 @@ int main()
     glDeleteVertexArrays(1, &skyboxVAO);
 
 
-    //NEW
+    
     glDeleteVertexArrays(1, &boxVAO);
     glDeleteVertexArrays(1, &lightVAO);
     glDeleteBuffers(1, &VBObox);
-    //NEW
+    
     glfwTerminate();
 
     return EXIT_SUCCESS;
 }
 
 
-
+//simple FPS counter that will display fps to our console 
 void printFPS() {
-    //create a FPS counter that displays to our console 
+ 
     static std::chrono::time_point<std::chrono::steady_clock> oldTime = std::chrono::high_resolution_clock::now();
     static int fps; fps++;
 
@@ -725,6 +706,8 @@ void printFPS() {
     }
 }
 
+
+// drawing a spotlight
 void drawspotlight (Shader L)
 
 {
@@ -755,6 +738,7 @@ void drawspotlight (Shader L)
     glUniform1f(glGetUniformLocation(L.Program, "spotLight.outerCutOff"), glm::cos(glm::radians(15.0f)));
 }
 
+//drawing our directional light
 void drawDirectionalLight(Shader L)
 {
     L.Use();
@@ -767,7 +751,7 @@ void drawDirectionalLight(Shader L)
     glUniform3f(glGetUniformLocation(L.Program, "dirLight.diffuse"), 0.4f, 0.4f, 0.4f);
     glUniform3f(glGetUniformLocation(L.Program, "dirLight.specular"), 0.5f, 0.5f, 0.5f);
 }
-
+// drawing our point lights 
 void drawPointlight(Shader L)
 
 {
@@ -1086,41 +1070,6 @@ void drawTerrain(Shader &s,  GLuint VAO, const unsigned int NUM_STRIPS, const un
     glUseProgram(0);
 }
 
-//
-//void drawTerraintwo(Shader& s, GLuint VAO2, const unsigned int NUM_STRIPS, const unsigned int NUM_VERTS_PER_STRIP)
-//{
-//    glm::mat4 projection(1.f);
-//    projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 10000.0f);
-//
-//    glm::mat4 view(1.f);
-//    view = camera.GetViewMatrix();
-//
-//    s.Use();
-//
-//    GLint modelLoc = glGetUniformLocation(s.Program, "model");
-//    GLint viewLoc = glGetUniformLocation(s.Program, "view");
-//    GLint projLoc = glGetUniformLocation(s.Program, "projection");
-//
-//    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-//    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-//
-//    glBindVertexArray(VAO2);
-//    glm::mat4 model(1.f);
-//    model = glm::translate(model, glm::vec3(0, -50, 0));
-//    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-//
-//    for (unsigned int strip = 0; strip < NUM_STRIPS; ++strip)
-//    {
-//        glDrawElements(GL_TRIANGLE_STRIP,   // primitive type
-//            NUM_VERTS_PER_STRIP, // number of indices to render
-//            GL_UNSIGNED_INT,     // index data type
-//            (void*)(sizeof(unsigned int)
-//                * NUM_VERTS_PER_STRIP
-//                * strip)); // offset to starting index
-//    }
-//
-//    glUseProgram(0);
-//}
 
 unsigned int loadCubemap(string faces[]) {
     unsigned int textureID;
